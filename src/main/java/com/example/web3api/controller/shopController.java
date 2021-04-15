@@ -41,7 +41,7 @@ public class shopController {
     public TransactionReceipt setProduct(@RequestParam BigInteger id,
                                          @RequestParam String name,
                                          @RequestParam BigInteger price) throws Exception {
-        return shopService.setProduct(ownerAddress, id, name, price);
+        return shopService.setProduct( id, name, price);
     }
 
     @GetMapping("shop/getHistory/{id}")

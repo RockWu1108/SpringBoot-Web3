@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
+import org.web3j.crypto.CipherException;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.quorum.Quorum;
@@ -17,6 +20,8 @@ import org.web3j.tx.ClientTransactionManager;
 import org.web3j.tx.TransactionManager;
 
 import okhttp3.OkHttpClient;
+
+import java.io.IOException;
 
 @Configuration
 public class  shopConfig {
@@ -28,6 +33,9 @@ public class  shopConfig {
 
     @Value("${web3j.client-address}")
     private String clientAddress;
+
+    private String pwd = "12345";
+    private String keystore = "C:\\Users\\6701\\Desktop\\tools\\geth\\db\\keystore\\UTC--2021-04-15T01-57-06.420205300Z--88be8da2c54ee601e9a4ce85f5bfd65b328db95a";
 
     @Autowired
     private shopProperties config;
@@ -54,7 +62,7 @@ public class  shopConfig {
 
     private Shop deployContract(Quorum quorum) throws Exception {
         LOG.info("About to deploy new contract...");
-        Shop contract = Shop.deploy(quorum, txManager(quorum), config.gas()).send();
+        Shop contract = Shop.deploy(quorum, getCredential(), config.gas()).send();
         LOG.info("Deployed new contract with address '{}'", contract.getContractAddress());
         return contract;
     }
@@ -63,4 +71,7 @@ public class  shopConfig {
         return new ClientTransactionManager(quorum, ownerAddress);
     }
 
+    private Credentials getCredential() throws IOException, CipherException {
+        return  WalletUtils.loadCredentials(pwd,keystore);
+    }
 }

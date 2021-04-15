@@ -10,7 +10,9 @@ import com.example.web3api.properties.shopProperties;
 import com.example.web3api.Shop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthBlock;
@@ -29,6 +31,8 @@ public class ShopService {
     private final String contractAddress;
     private final Quorum quorum;
     private final shopProperties config;
+    private String pwd = "12345";
+    private String keystore = "C:\\Users\\6701\\Desktop\\tools\\geth\\db\\keystore\\UTC--2021-04-15T01-57-06.420205300Z--88be8da2c54ee601e9a4ce85f5bfd65b328db95a";
 
 
     public ShopService(String contractAddress, Quorum quorum, shopProperties config) {
@@ -42,28 +46,31 @@ public class ShopService {
     }
 
 
-    private Shop loadContract(String accountAddress) {
-        return Shop.load(contractAddress, quorum, txManager(accountAddress), config.gas());
+    private Shop loadContract() throws IOException, CipherException {
+        return Shop.load(contractAddress, quorum, getCredential(), config.gas());
     }
 
+    private Credentials getCredential() throws IOException, CipherException {
+        return  WalletUtils.loadCredentials(pwd,keystore);
+    }
 
 
     private TransactionManager txManager(String accountAddress) {
         return new ClientTransactionManager(quorum, accountAddress);
     }
 
-    public TransactionReceipt setProduct(String ownerAddress,
+    public TransactionReceipt setProduct(
                              BigInteger id,
                              String name,
                              BigInteger price) throws Exception {
-        Shop shop = loadContract(ownerAddress);
+        Shop shop = loadContract();
         TransactionReceipt transactionReceipt = shop.setProduct(id, name, price).send();
         return  transactionReceipt;
     }
 
     public  HashMap<String, Object> getHistory(String ownerAddress,BigInteger id)throws Exception{
 
-        Shop shop = loadContract(ownerAddress);
+        Shop shop = loadContract();
         Tuple2<String, BigInteger> result = shop.getHistory(id).sendAsync().get();
         HashMap<String, Object> map = new HashMap<>();
         map.put("productName" , result.getValue1());
@@ -72,7 +79,7 @@ public class ShopService {
     }
 
     public  HashMap<String, Object> buyProduct(String testAddress, BigInteger id, BigInteger amount) throws Exception {
-        Shop shop = loadContract(testAddress);
+        Shop shop = loadContract();
         HashMap<String, Object> map = new HashMap<>();
 
         if(!shop.isRegister(testAddress).send()){
@@ -90,7 +97,7 @@ public class ShopService {
     }
 
     public  HashMap<String, Object> register(String testAddress) throws Exception {
-        Shop shop = loadContract(testAddress);
+        Shop shop = loadContract();
         HashMap<String, Object> map = new HashMap<>();
 
         if(shop.isRegister(testAddress).send().booleanValue()){
@@ -105,8 +112,5 @@ public class ShopService {
     }
 
 
-    public Boolean getNetListening() throws IOException {
-        return quorum.netListening().send().isListening();
-    }
 
 }
