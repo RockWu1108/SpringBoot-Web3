@@ -10,40 +10,46 @@ import com.example.web3api.properties.shopProperties;
 import com.example.web3api.Shop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.quorum.Quorum;
 import org.web3j.tuples.generated.Tuple2;
 import org.web3j.tx.ClientTransactionManager;
 import org.web3j.tx.TransactionManager;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
-public class shopService {
+
+public class ShopService {
+
 
     private final String contractAddress;
-    private final Web3j web3j;
+    private final Quorum quorum;
     private final shopProperties config;
 
 
-    public shopService(String contractAddress, Web3j web3j, shopProperties config) {
+    public ShopService(String contractAddress, Quorum quorum, shopProperties config) {
         this.contractAddress = contractAddress;
-        this.web3j = web3j;
+        this.quorum = quorum;
         this.config = config;
     }
 
     public BigInteger getBalance() throws IOException {
-        return web3j.ethGetBalance(contractAddress, DefaultBlockParameterName.LATEST).send().getBalance();
+        return quorum.ethGetBalance(contractAddress, DefaultBlockParameterName.LATEST).send().getBalance();
     }
 
 
     private Shop loadContract(String accountAddress) {
-        return Shop.load(contractAddress, web3j, txManager(accountAddress), config.gas());
+        return Shop.load(contractAddress, quorum, txManager(accountAddress), config.gas());
     }
 
+
+
     private TransactionManager txManager(String accountAddress) {
-        return new ClientTransactionManager(web3j, accountAddress);
+        return new ClientTransactionManager(quorum, accountAddress);
     }
 
     public TransactionReceipt setProduct(String ownerAddress,
@@ -96,6 +102,11 @@ public class shopService {
             map.put("result" , result);
         }
         return map;
+    }
+
+
+    public Boolean getNetListening() throws IOException {
+        return quorum.netListening().send().isListening();
     }
 
 }

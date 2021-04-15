@@ -40,6 +40,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.web3j</groupId>
+            <artifactId>quorum</artifactId>
+            <version>4.8.4</version>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>

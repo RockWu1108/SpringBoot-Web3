@@ -1,12 +1,12 @@
 package com.example.web3api.controller;
 
-import com.example.web3api.service.shopService;
+import com.example.web3api.service.ShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.quorum.Quorum;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -22,13 +22,13 @@ public class shopController {
     @Value("${lottery.contract.test-address}")
     private String testAddress;
 
-    private final shopService shopService;
+    private final ShopService shopService;
 
     @Autowired
-    private Web3j web3j;
+    private Quorum quorum;
 
     @Autowired
-    public shopController(shopService shopService) {
+    public shopController(ShopService shopService) {
         this.shopService = shopService;
     }
 
@@ -60,5 +60,8 @@ public class shopController {
     public HashMap<String, Object>register()throws Exception{
         return shopService.register(testAddress);
     }
+
+
+
 
 }

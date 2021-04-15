@@ -2,7 +2,7 @@ package com.example.web3api.config;
 
 import com.example.web3api.Shop;
 import com.example.web3api.properties.shopProperties;
-import com.example.web3api.service.shopService;
+import com.example.web3api.service.ShopService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.quorum.Quorum;
 import org.web3j.tx.ClientTransactionManager;
 import org.web3j.tx.TransactionManager;
 
@@ -32,34 +33,34 @@ public class  shopConfig {
     private shopProperties config;
 
     @Bean
-    public Web3j web3j() {
-        return Web3j.build(new HttpService(clientAddress, new OkHttpClient.Builder().build()));
+    public Quorum Quorum() {
+        return Quorum.build(new HttpService(clientAddress, new OkHttpClient.Builder().build()));
     }
 
     @Bean
-    public shopService contract(Web3j web3j, @Value("${lottery.contract.address:}") String contractAddress)
+    public ShopService contract(Quorum quorum, @Value("${lottery.contract.address:}") String contractAddress)
             throws Exception {
         if (StringUtils.isEmpty(contractAddress)) {
-            Shop shop = deployContract(web3j);
-            return initShopService(shop.getContractAddress(), web3j);
+            Shop shop = deployContract(quorum);
+            return initShopService(shop.getContractAddress(), quorum);
         }
 
-        return initShopService(contractAddress, web3j);
+        return initShopService(contractAddress, quorum);
     }
 
-    private shopService initShopService(String contractAddress, Web3j web3j) {
-        return new shopService(contractAddress, web3j, config);
+    private ShopService initShopService(String contractAddress, Quorum quorum) {
+        return new ShopService(contractAddress, quorum, config);
     }
 
-    private Shop deployContract(Web3j web3j) throws Exception {
+    private Shop deployContract(Quorum quorum) throws Exception {
         LOG.info("About to deploy new contract...");
-        Shop contract = Shop.deploy(web3j, txManager(web3j), config.gas()).send();
+        Shop contract = Shop.deploy(quorum, txManager(quorum), config.gas()).send();
         LOG.info("Deployed new contract with address '{}'", contract.getContractAddress());
         return contract;
     }
 
-    private TransactionManager txManager(Web3j web3j) {
-        return new ClientTransactionManager(web3j, ownerAddress);
+    private TransactionManager txManager(Quorum quorum) {
+        return new ClientTransactionManager(quorum, ownerAddress);
     }
 
 }
