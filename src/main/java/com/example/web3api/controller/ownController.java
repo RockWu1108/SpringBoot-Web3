@@ -37,8 +37,6 @@ public class ownController {
     @GetMapping("/owner/balance")
     public BigInteger getBalance() throws IOException {
         EthGetBalance wei = quorum.ethGetBalance(ownerAddress, DefaultBlockParameterName.LATEST).send();
-
-
         return wei.getBalance();
     }
 
@@ -87,5 +85,13 @@ public class ownController {
         }
         return  null;
     }
+
+    @GetMapping("/owner/geTransactionCount")
+    public BigInteger geTransactionCount() throws IOException {
+        EthGetTransactionCount ethGetTransactionCount = quorum.ethGetTransactionCount(ownerAddress,DefaultBlockParameterName.LATEST).send();
+        BigInteger nonce = ethGetTransactionCount.getTransactionCount();
+        return nonce;
+    }
+
 
 }

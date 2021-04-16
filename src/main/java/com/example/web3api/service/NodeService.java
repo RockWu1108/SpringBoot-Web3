@@ -2,6 +2,7 @@ package com.example.web3api.service;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.web3j.quorum.Quorum;
@@ -25,8 +26,12 @@ public class NodeService {
         return quorum.netPeerCount().send().getQuantity();
     }
 
-    public BigInteger getNodeCount() throws  IOException{
+    public BigInteger getNodeBlockNumber() throws  IOException{
         return  quorum.ethBlockNumber().send().getBlockNumber();
+    }
+
+    public List<String> getNodeAccount() throws  IOException{
+        return  quorum.ethAccounts().send().getAccounts();
     }
 
 

@@ -3,26 +3,21 @@ package com.example.web3api.service;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
 
 import com.example.web3api.properties.shopProperties;
 import com.example.web3api.Shop;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.quorum.Quorum;
 import org.web3j.tuples.generated.Tuple2;
 import org.web3j.tx.ClientTransactionManager;
+import org.web3j.tx.FastRawTransactionManager;
 import org.web3j.tx.TransactionManager;
-import org.web3j.utils.Convert;
-import org.web3j.utils.Convert.Unit;
+import org.web3j.tx.response.Callback;
+import org.web3j.tx.response.PollingTransactionReceiptProcessor;
 
 
 public class ShopService {
@@ -46,12 +41,15 @@ public class ShopService {
     }
 
 
-    private Shop loadContract() throws IOException, CipherException {
-        return Shop.load(contractAddress, quorum, getCredential(), config.gas());
+    private Shop loadContract(String privateKey) throws IOException, CipherException {
+        FastRawTransactionManager fastRawTxMgr =new FastRawTransactionManager(quorum, getCredential(privateKey), new PollingTransactionReceiptProcessor(quorum, 20, 20));
+        return Shop.load(contractAddress, quorum,fastRawTxMgr, config.gas());
     }
 
-    private Credentials getCredential() throws IOException, CipherException {
-        return  WalletUtils.loadCredentials(pwd,keystore);
+
+    private Credentials getCredential(String privateKey) throws IOException, CipherException {
+        Credentials credentials = Credentials.create(privateKey);
+        return  credentials;
     }
 
 
@@ -60,34 +58,44 @@ public class ShopService {
     }
 
     public TransactionReceipt setProduct(
+                             String privateKey,
                              BigInteger id,
                              String name,
                              BigInteger price) throws Exception {
-        Shop shop = loadContract();
+
+        //等待交易被挖掘
+        Shop shop = loadContract(privateKey);
+
+
         TransactionReceipt transactionReceipt = shop.setProduct(id, name, price).send();
+//        do{
+//
+//            EthGetTransactionReceipt ethGetTransactionReceiptResp = quorum.ethGetTransactionReceipt(result.getTransactionHash()).send();
+//            transactionReceipt = ethGetTransactionReceiptResp.getTransactionReceipt();
+//            Thread.sleep(1500); // 3秒後重試
+//        }while (!transactionReceipt.isPresent() && nonce.compareTo(quorum.ethGetTransactionCount(getCredential().getAddress(),DefaultBlockParameterName.LATEST).send().getTransactionCount())==-1);
         return  transactionReceipt;
     }
 
-    public  HashMap<String, Object> getHistory(String ownerAddress,BigInteger id)throws Exception{
+    public  HashMap<String, Object> getHistory(String privateKey,BigInteger id)throws Exception{
 
-        Shop shop = loadContract();
-        Tuple2<String, BigInteger> result = shop.getHistory(id).sendAsync().get();
+        Shop shop = loadContract(privateKey);
+        Tuple2<String, BigInteger> result = shop.getHistory(id).send();
         HashMap<String, Object> map = new HashMap<>();
         map.put("productName" , result.getValue1());
         map.put("amount" , result.getValue2());
         return  map ;
     }
 
-    public  HashMap<String, Object> buyProduct(String testAddress, BigInteger id, BigInteger amount) throws Exception {
-        Shop shop = loadContract();
+    public  HashMap<String, Object> buyProduct(String privateKey, BigInteger id, BigInteger amount) throws Exception {
+        Shop shop = loadContract(privateKey);
         HashMap<String, Object> map = new HashMap<>();
 
-        if(!shop.isRegister(testAddress).send()){
+        if(!shop.isRegister(getCredential(privateKey).getAddress()).send()){
             map.put("errorMessage" , "You didnt register");
         }
         else{
             BigInteger price = shop.product(id).send().getValue2();
-
             TransactionReceipt transactionReceipt = shop.buyProduct(id , amount , price.multiply(amount)).send();
             System.out.println("Price :" + price);
             System.out.println("TransactionReceipt:" + transactionReceipt.getTransactionHash());
@@ -96,11 +104,11 @@ public class ShopService {
         return map;
     }
 
-    public  HashMap<String, Object> register(String testAddress) throws Exception {
-        Shop shop = loadContract();
+    public  HashMap<String, Object> register(String privateKey) throws Exception {
+        Shop shop = loadContract(privateKey);
         HashMap<String, Object> map = new HashMap<>();
 
-        if(shop.isRegister(testAddress).send().booleanValue()){
+        if(shop.isRegister(getCredential(privateKey).getAddress()).send().booleanValue()){
             map.put("errorMessage" , "You have register");
         }
         else{
@@ -110,7 +118,16 @@ public class ShopService {
         }
         return map;
     }
+}
+class MyCallback implements Callback{
 
+    @Override
+    public void accept(TransactionReceipt transactionReceipt) {
+        System.out.println(transactionReceipt.getTransactionHash());
+    }
 
-
+    @Override
+    public void exception(Exception e) {
+        System.out.println(e);
+    }
 }

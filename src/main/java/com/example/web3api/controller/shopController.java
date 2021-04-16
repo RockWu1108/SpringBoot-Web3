@@ -4,7 +4,6 @@ import com.example.web3api.service.ShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.quorum.Quorum;
 
@@ -39,9 +38,10 @@ public class shopController {
 
     @PostMapping("/shop/setProduct")
     public TransactionReceipt setProduct(@RequestParam BigInteger id,
+                                         @RequestParam String privateKey,
                                          @RequestParam String name,
                                          @RequestParam BigInteger price) throws Exception {
-        return shopService.setProduct( id, name, price);
+        return shopService.setProduct( privateKey,id, name, price);
     }
 
     @GetMapping("shop/getHistory/{id}")

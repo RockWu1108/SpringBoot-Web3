@@ -5,12 +5,11 @@ import com.example.web3api.service.NodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.web3j.protocol.Web3j;
 import org.web3j.quorum.Quorum;
-import org.web3j.quorum.methods.response.raft.RaftCluster;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.List;
 
 @RestController
 public class nodeController {
@@ -36,15 +35,20 @@ public class nodeController {
         return  nodeService.getNetPeerCount();
     }
 
-    @GetMapping("/node/getNodeCount")
-    public BigInteger getNodeCount() throws IOException {
-        return  nodeService.getNodeCount();
+    @GetMapping("/node/getNodeBlockNumber")
+    public BigInteger getNodeBlockNumber() throws IOException {
+        return  nodeService.getNodeBlockNumber();
     }
 
 //    @GetMapping("/node/getPeerInfo")
 //    public String getPeerInfo() throws  IOException {
-//        return  nodeService.getPeerInfo();
-//    }
+////        return  nodeService.getPeerInfo();
+////    }
+
+       @GetMapping("/node/getNodeAccount")
+    public List<String> getAccount() throws  IOException {
+        return  nodeService.getNodeAccount();
+    }
 
 
 
