@@ -18,6 +18,7 @@ public class shopProperties {
     private BigInteger gasLimit;
 
     public StaticGasProvider gas() {
+
         return new StaticGasProvider(gasPrice, gasLimit);
     }
 }

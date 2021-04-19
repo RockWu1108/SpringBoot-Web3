@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashMap;
 
+import com.example.web3api.config.shopConfig;
 import com.example.web3api.properties.shopProperties;
 import com.example.web3api.Shop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
@@ -30,6 +33,7 @@ public class ShopService {
     private String keystore = "C:\\Users\\6701\\Desktop\\tools\\geth\\db\\keystore\\UTC--2021-04-15T01-57-06.420205300Z--88be8da2c54ee601e9a4ce85f5bfd65b328db95a";
 
 
+
     public ShopService(String contractAddress, Quorum quorum, shopProperties config) {
         this.contractAddress = contractAddress;
         this.quorum = quorum;
@@ -42,7 +46,7 @@ public class ShopService {
 
 
     private Shop loadContract(String privateKey) throws IOException, CipherException {
-        FastRawTransactionManager fastRawTxMgr =new FastRawTransactionManager(quorum, getCredential(privateKey), new PollingTransactionReceiptProcessor(quorum, 20, 20));
+        FastRawTransactionManager fastRawTxMgr =new FastRawTransactionManager(quorum, getCredential(privateKey), new PollingTransactionReceiptProcessor(quorum, 10, 20 ));
         return Shop.load(contractAddress, quorum,fastRawTxMgr, config.gas());
     }
 
@@ -65,8 +69,6 @@ public class ShopService {
 
         //等待交易被挖掘
         Shop shop = loadContract(privateKey);
-
-
         TransactionReceipt transactionReceipt = shop.setProduct(id, name, price).send();
 //        do{
 //

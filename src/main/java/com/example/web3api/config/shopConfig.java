@@ -57,6 +57,7 @@ public class  shopConfig {
     }
 
     private ShopService initShopService(String contractAddress, Quorum quorum) {
+
         return new ShopService(contractAddress, quorum, config);
     }
 

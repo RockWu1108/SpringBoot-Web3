@@ -40,10 +40,11 @@ public class nodeController {
         return  nodeService.getNodeBlockNumber();
     }
 
-//    @GetMapping("/node/getPeerInfo")
-//    public String getPeerInfo() throws  IOException {
-////        return  nodeService.getPeerInfo();
-////    }
+    @GetMapping("/node/getPeerInfo")
+    public String getPeerInfo() throws  IOException {
+
+        return  nodeService.getPeerInfo();
+    }
 
        @GetMapping("/node/getNodeAccount")
     public List<String> getAccount() throws  IOException {
