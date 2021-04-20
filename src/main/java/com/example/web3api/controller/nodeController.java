@@ -10,6 +10,7 @@ import org.web3j.quorum.Quorum;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class nodeController {
@@ -41,7 +42,7 @@ public class nodeController {
     }
 
     @GetMapping("/node/getPeerInfo")
-    public String getPeerInfo() throws  IOException {
+    public Map<String, Object> getPeerInfo() throws  IOException {
 
         return  nodeService.getPeerInfo();
     }

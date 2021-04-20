@@ -1,20 +1,16 @@
 package com.example.web3api.service;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
-import java.net.http.HttpClient;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
-import jdk.jfr.Frequency;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.web3j.quorum.Quorum;
 @Service
@@ -45,29 +41,29 @@ public class NodeService {
     }
 
 
-    public String getPeerInfo() throws  IOException {
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        CloseableHttpResponse response =null;
-        try{
-            HttpPost httpPost = new HttpPost("http://211.75.194.27:22000");
-            String json = "{\"jsonrpc\":\"2.0\",\"method\":\"raft_cluster\",\"params\":[],\"id\":\"1\"}";
-            StringEntity entity = new StringEntity(json);
-            httpPost.setEntity(entity);
-            httpPost.setHeader("Accept","application/json");
-            httpPost.setHeader("Content-type" , "application/x-www-form-urlencoded");
-            response = httpClient.execute(httpPost);
-
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        HttpEntity entity = response.getEntity();
+    public Map<String, Object> getPeerInfo() throws  IOException {
+        Map<String, Object> jsonMap=null;
         try {
-            System.out.println(EntityUtils.toString(entity));
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return EntityUtils.toString(entity);
+            String queryUrl = "http://211.75.194.27:22000";
+            String json = "{\"jsonrpc\":\"2.0\",\"method\":\"raft_cluster\",\"params\":[],\"id\":\"1\"}";
+            URL url = new URL(queryUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(5000);
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setRequestMethod("POST");
+
+            OutputStream os = conn.getOutputStream();
+            os.write(json.getBytes("UTF-8"));
+            os.close();
+
+            InputStream in = new BufferedInputStream(conn.getInputStream());
+            ObjectMapper mapper = new ObjectMapper();
+            jsonMap = mapper.readValue(in, Map.class);
+            in.close();
+        }catch (Exception e){e.printStackTrace();}
+        return  jsonMap ;
     }
+
 }

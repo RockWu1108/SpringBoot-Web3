@@ -44,6 +44,7 @@
             <artifactId>quorum</artifactId>
             <version>4.8.4</version>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -53,58 +54,28 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.1-beta1</version>
+            <version>4.4</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.2</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.3</version>
+            <artifactId>httpclient-cache</artifactId>
+            <version>4.5.2</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-io -->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-vault-config</artifactId>
-        </dependency>
-
-
 
     </dependencies>
-
-    <build>
-        <plugins>
-
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.web3j</groupId>
-                <artifactId>web3j-maven-plugin</artifactId>
-                <version>0.3.7</version>
-                <configuration>
-                    <packageName>org.sgitario.lottery.blockchain.model</packageName>
-                    <nativeJavaType>true</nativeJavaType>
-                    <outputFormat>java,bin,abi</outputFormat>
-                    <soliditySourceFiles>
-                        <directory>src/main/resources/contracts</directory>
-                        <includes>
-                            <include>*.sol</include>
-                        </includes>
-                    </soliditySourceFiles>
-                    <outputDirectory>
-                        <java>src/main/java</java>
-                        <bin>src/main/resources/bin/generated</bin>
-                        <abi>src/main/resources/abi/generated</abi>
-                    </outputDirectory>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>
