@@ -1,7 +1,9 @@
 package com.example.web3api.controller;
 
 
+import com.example.web3api.RR.RoundRobin;
 import com.example.web3api.service.ShopService;
+import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +13,7 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
+import org.web3j.protocol.http.HttpService;
 import org.web3j.quorum.Quorum;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
@@ -23,8 +26,8 @@ public class ownController {
     @Value("${lottery.contract.owner-address}")
     private String ownerAddress;
 
-    @Autowired
-    private Quorum quorum;
+//    @Autowired
+    private Quorum quorum=Quorum.build(new HttpService(RoundRobin.getServer(), new OkHttpClient.Builder().build()));;
 
     @Autowired
     private ShopService shopService;

@@ -3,6 +3,7 @@ package com.example.web3api.config;
 import com.example.web3api.Shop;
 import com.example.web3api.properties.shopProperties;
 import com.example.web3api.service.ShopService;
+import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,18 +14,15 @@ import org.springframework.util.StringUtils;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.quorum.Quorum;
 import org.web3j.tx.ClientTransactionManager;
 import org.web3j.tx.TransactionManager;
 
-import okhttp3.OkHttpClient;
-
 import java.io.IOException;
 
 @Configuration
-public class  shopConfig {
+public class shopConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(shopConfig.class);
 
@@ -52,7 +50,6 @@ public class  shopConfig {
             Shop shop = deployContract(quorum);
             return initShopService(shop.getContractAddress(), quorum);
         }
-
         return initShopService(contractAddress, quorum);
     }
 
@@ -73,6 +70,6 @@ public class  shopConfig {
     }
 
     private Credentials getCredential() throws IOException, CipherException {
-        return  WalletUtils.loadCredentials(pwd,keystore);
+        return WalletUtils.loadCredentials(pwd, keystore);
     }
 }

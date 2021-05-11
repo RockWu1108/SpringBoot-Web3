@@ -1,5 +1,6 @@
 package com.example.web3api.controller;
 
+import com.example.web3api.RR.RoundRobin;
 import com.example.web3api.service.ShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,22 +45,30 @@ public class shopController {
         return shopService.setProduct( privateKey,id, name, price);
     }
 
-    @GetMapping("shop/getHistory/{id}")
-    public Map<String, Object> getProduct(@PathVariable BigInteger id) throws Exception {
+    @PostMapping("/shop/getHistory")
+    public Map<String, Object> getHistory(@RequestParam BigInteger id,
+                                          @RequestParam String privateKey) throws Exception {
 
-        return shopService.getHistory(ownerAddress, id);
+        return shopService.getHistory(privateKey, id);
     }
     @PostMapping("/shop/buyProduct")
     public  HashMap<String, Object> buyProduct(
             @RequestParam BigInteger id,
+            @RequestParam String privateKey,
             @RequestParam BigInteger amount)throws Exception{
-        return shopService.buyProduct(testAddress , id , amount);
+        return shopService.buyProduct(privateKey , id , amount);
     }
 
     @PostMapping("/shop/register")
-    public HashMap<String, Object>register()throws Exception{
-        return shopService.register(testAddress);
+    public HashMap<String, Object>register(@RequestParam String privateKey)throws Exception{
+        return shopService.register(privateKey);
     }
+
+//    @GetMapping("/shop/getIp")
+//    public String getIp()throws Exception{
+//        return RoundRobin.getServer();
+//    }
+
 
 
 
